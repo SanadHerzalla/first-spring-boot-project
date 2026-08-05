@@ -1,0 +1,74 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-accounts-table
+      author: sanad
+
+      changes:
+        - createTable:
+            tableName: accounts
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_accounts
+                    nullable: false
+
+              - column:
+                  name: bank_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: account_number
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: owner_name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: account_type
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: balance
+                  type: DECIMAL(19,2)
+                  defaultValueNumeric: 0.00
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: accounts
+            baseColumnNames: bank_id
+            referencedTableName: banks
+            referencedColumnNames: id
+            constraintName: fk_accounts_bank
+            onDelete: CASCADE
+
+        - addUniqueConstraint:
+            tableName: accounts
+            columnNames: bank_id, account_number
+            constraintName: uk_accounts_bank_account_number
+
+        - sql:
+            sql: >
+              ALTER TABLE accounts
+              ADD CONSTRAINT chk_accounts_balance_non_negative
+              CHECK (balance >=0)

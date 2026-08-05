@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.dto;
+package com.sanad.firstspringbootproject.dto.bank;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

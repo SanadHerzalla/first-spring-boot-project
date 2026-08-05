@@ -10,7 +10,6 @@ this package and its child packages*/
 public class FirstSpringBootProjectApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(FirstSpringBootProjectApplication.class, args);
     }
 

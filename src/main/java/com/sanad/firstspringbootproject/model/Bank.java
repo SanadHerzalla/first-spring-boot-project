@@ -15,7 +15,6 @@ import jakarta.persistence.*;
 )
 public class Bank {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

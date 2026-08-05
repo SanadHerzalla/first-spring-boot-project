@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.exception;
+package com.sanad.firstspringbootproject.exception.bank;
 
 public class ConcurrentUpdateException extends RuntimeException {
     public ConcurrentUpdateException() {

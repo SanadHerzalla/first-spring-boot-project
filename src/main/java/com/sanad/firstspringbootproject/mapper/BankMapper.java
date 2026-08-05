@@ -1,6 +1,6 @@
 package com.sanad.firstspringbootproject.mapper;
 
-import com.sanad.firstspringbootproject.dto.BankResponse;
+import com.sanad.firstspringbootproject.dto.bank.BankResponse;
 import com.sanad.firstspringbootproject.model.Bank;
 import org.springframework.stereotype.Component;
 

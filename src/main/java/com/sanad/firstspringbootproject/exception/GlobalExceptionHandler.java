@@ -1,6 +1,10 @@
 package com.sanad.firstspringbootproject.exception;
 
 import com.sanad.firstspringbootproject.dto.ApiErrorResponse;
+import com.sanad.firstspringbootproject.exception.account.AccountNotFoundException;
+import com.sanad.firstspringbootproject.exception.account.DuplicateAccountException;
+import com.sanad.firstspringbootproject.exception.bank.BankNotFoundException;
+import com.sanad.firstspringbootproject.exception.bank.DuplicateBankException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,22 +26,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateBankException.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicateBankException(DuplicateBankException exception, HttpServletRequest request) {
         ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), HttpStatus.CONFLICT.value(), "Conflict", exception.getMessage(), request.getRequestURI());
-        return  ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<ApiErrorResponse> handleOptimisticLockingFailure(
-            ObjectOptimisticLockingFailureException exception,
-            HttpServletRequest request
-    ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                "Conflict",
-                "The banks was changed by another request. " + "Refresh the data and try again.",
-                request.getRequestURI()
-        );
+    public ResponseEntity<ApiErrorResponse> handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException exception, HttpServletRequest request) {
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), HttpStatus.CONFLICT.value(), "Conflict", "The banks was changed by another request. " + "Refresh the data and try again.", request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountNotFoundException(AccountNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(DuplicateAccountException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateAccountException(DuplicateAccountException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
     }
 }
