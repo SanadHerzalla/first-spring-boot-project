@@ -1,8 +1,6 @@
 package com.sanad.firstspringbootproject.model;
 
-
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 
 @Entity
