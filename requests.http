@@ -1,0 +1,32 @@
+### Get banks
+GET http://localhost:8080/banks
+
+### Create bank
+POST http://localhost:8080/banks
+Content-Type: application/json
+
+{
+  "name": "Jordan Bank"
+}
+
+### Update bank
+PUT http://localhost:8080/banks/2
+Content-Type: application/json
+
+{
+  "name": "Cairo Bank"
+}
+
+### Delete bank
+DELETE http://localhost:8080/banks/3
+
+### Find unkown bank
+GET http://localhost:8080/banks/999
+
+### Create duplicate bank
+POST http://localhost:8080/banks
+Content-Type: application/json
+
+{
+  "name": "Arab Bank"
+}
