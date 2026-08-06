@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.exception.account;
+package com.sanad.firstspringbootproject.exception;
 
 public class AccountNotFoundException extends RuntimeException {
     public AccountNotFoundException(long bankId, String accountNumber) {

@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-restrict-bank-deletion
+      author: sanad
+
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: accounts
+            constraintName: fk_accounts_bank
+
+        - addForeignKeyConstraint:
+            baseTableName: accounts
+            baseColumnNames: bank_id
+            referencedTableName: banks
+            referencedColumnNames: id
+            constraintName: fk_accounts_bank
+            onDelete: RESTRICT

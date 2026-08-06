@@ -1,12 +1,11 @@
 package com.sanad.firstspringbootproject.service;
 
 import com.sanad.firstspringbootproject.dto.bank.BankResponse;
-import com.sanad.firstspringbootproject.exception.bank.BankNotFoundException;
-import com.sanad.firstspringbootproject.exception.bank.DuplicateBankException;
+import com.sanad.firstspringbootproject.exception.BankNotFoundException;
+import com.sanad.firstspringbootproject.exception.DuplicateBankException;
 import com.sanad.firstspringbootproject.mapper.BankMapper;
 import com.sanad.firstspringbootproject.model.Bank;
 import com.sanad.firstspringbootproject.repository.SpringDataBankRepository;
-import com.sanad.firstspringbootproject.service.bank.BankService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

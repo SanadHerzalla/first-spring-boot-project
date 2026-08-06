@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.exception.bank;
+package com.sanad.firstspringbootproject.exception;
 
 public class DuplicateBankException extends RuntimeException {
     public DuplicateBankException(String name) {

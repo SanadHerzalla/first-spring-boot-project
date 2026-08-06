@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.exception.bank;
+package com.sanad.firstspringbootproject.exception;
 
 
 public class BankNotFoundException extends RuntimeException {

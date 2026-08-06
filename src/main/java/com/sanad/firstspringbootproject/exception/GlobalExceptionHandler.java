@@ -1,10 +1,6 @@
 package com.sanad.firstspringbootproject.exception;
 
 import com.sanad.firstspringbootproject.dto.ApiErrorResponse;
-import com.sanad.firstspringbootproject.exception.account.AccountNotFoundException;
-import com.sanad.firstspringbootproject.exception.account.DuplicateAccountException;
-import com.sanad.firstspringbootproject.exception.bank.BankNotFoundException;
-import com.sanad.firstspringbootproject.exception.bank.DuplicateBankException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +43,33 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateAccountException.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicateAccountException(DuplicateAccountException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ApiErrorResponse> handleInsufficientBalanceException(InsufficientBalanceException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(BankHasAccountsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBankHasAccountsException(BankHasAccountsException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.CONFLICT;
 
         ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());

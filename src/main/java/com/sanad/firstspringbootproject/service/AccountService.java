@@ -1,9 +1,7 @@
 package com.sanad.firstspringbootproject.service;
 
 import com.sanad.firstspringbootproject.dto.account.AccountResponse;
-import com.sanad.firstspringbootproject.exception.account.AccountNotFoundException;
-import com.sanad.firstspringbootproject.exception.bank.BankNotFoundException;
-import com.sanad.firstspringbootproject.exception.account.DuplicateAccountException;
+import com.sanad.firstspringbootproject.exception.*;
 import com.sanad.firstspringbootproject.mapper.AccountMapper;
 import com.sanad.firstspringbootproject.model.Account;
 import com.sanad.firstspringbootproject.model.AccountType;
@@ -13,7 +11,13 @@ import com.sanad.firstspringbootproject.repository.SpringDataBankRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.sanad.firstspringbootproject.dto.PageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -30,10 +34,19 @@ public class AccountService {
         this.accountMapper = accountMapper;
     }
 
-    public List<AccountResponse> findAllByBankId(long bankId) {
+    public PageResponse<AccountResponse> findAllByBankId(long bankId, int page, int size) {
         findBankById(bankId);
 
-        return accountRepository.findAllByBankId(bankId).stream().map(accountMapper::toResponse).toList();
+        validatePagintation(page, size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+
+        Page<Account> accountPage = accountRepository.findAllByBankId(bankId, pageable);
+
+        List<AccountResponse> content = accountPage.getContent().stream().map(accountMapper::toResponse).toList();
+
+        return new PageResponse<>(content, accountPage.getNumber(), accountPage.getSize(), accountPage.getTotalElements(), accountPage.getTotalPages()
+        , accountPage.isFirst(), accountPage.isLast());
     }
 
     public AccountResponse findByAccountNumber(long bankId, String requestedAccountNumber) {
@@ -91,6 +104,38 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    @Transactional
+    public AccountResponse deposit(long bankId, String requestedAccountNumber, BigDecimal amount) {
+        validateAmount(amount);
+        String accountNumber = cleanAccountNumber(requestedAccountNumber);
+
+        int updatedRows = accountRepository.deposit(bankId, accountNumber, amount);
+
+        if (updatedRows == 0){
+            throw new AccountNotFoundException(bankId, accountNumber);
+        }
+
+        Account updatedAccount = findAccount(bankId, accountNumber);
+
+        return accountMapper.toResponse(updatedAccount);
+    }
+
+    @Transactional
+    public AccountResponse withdraw(long bankId, String requestedAccountNumber, BigDecimal amount) {
+        validateAmount(amount);
+        String accountNumber = cleanAccountNumber(requestedAccountNumber);
+
+        int updatedRows = accountRepository.withdraw(bankId, accountNumber, amount);
+        if (updatedRows == 0){
+            Account account = findAccount(bankId, accountNumber);
+            throw new InsufficientBalanceException(accountNumber, account.getBalance());
+        }
+
+        Account updatedAccount = findAccount(bankId, accountNumber);
+
+        return  accountMapper.toResponse(updatedAccount);
+    }
+
     private Bank findBankById(long bankId) {
         return bankRepository.findById(bankId).orElseThrow(() -> new BankNotFoundException(bankId));
     }
@@ -105,5 +150,21 @@ public class AccountService {
 
     private String cleanOwnerName(String ownerName) {
         return ownerName.trim().replaceAll("\\s+", " ");
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException(amount);
+        }
+    }
+
+    private void validatePagintation(int page, int size) {
+        if (page < 0){
+            throw new IllegalArgumentException("Page number must not be negative");
+        }
+
+        if (size < 1 || size > 100){
+            throw new IllegalArgumentException("Size must be between 1 and 100");
+        }
     }
 }

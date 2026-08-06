@@ -1,4 +1,4 @@
-package com.sanad.firstspringbootproject.exception.account;
+package com.sanad.firstspringbootproject.exception;
 
 public class DuplicateAccountException extends  RuntimeException {
     public  DuplicateAccountException(String accountNumber, Long bankId) {

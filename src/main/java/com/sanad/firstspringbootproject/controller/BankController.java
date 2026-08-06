@@ -3,7 +3,7 @@ package com.sanad.firstspringbootproject.controller;
 import com.sanad.firstspringbootproject.dto.bank.BankResponse;
 import com.sanad.firstspringbootproject.dto.bank.CreateBankRequest;
 import com.sanad.firstspringbootproject.dto.bank.UpdateBankRequest;
-import com.sanad.firstspringbootproject.service.bank.BankService;
+import com.sanad.firstspringbootproject.service.BankService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
