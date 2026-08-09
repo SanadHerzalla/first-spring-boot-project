@@ -76,4 +76,32 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(response);
     }
+
+    @ExceptionHandler(IdempotencyConflictException.class)
+    public ResponseEntity<ApiErrorResponse> handleIdempotencyConflictException(IdempotencyConflictException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(OperationInProgressException.class)
+    public ResponseEntity<ApiErrorResponse> handleOperationInProgressException(OperationInProgressException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(SameAccountTransferException.class)
+    public ResponseEntity<ApiErrorResponse> handleSameAccountTransfer(SameAccountTransferException exception, HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), exception.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(response);
+    }
 }

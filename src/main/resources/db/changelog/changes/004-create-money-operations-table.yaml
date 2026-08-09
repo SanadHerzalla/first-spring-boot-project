@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-money-operations-table
+      author: sanad
+
+      changes:
+        - createTable:
+            tableName: money_operations
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_money_operations
+                    nullable: false
+
+              - column:
+                  name: idempotency_key
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: operation_type
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: source_bank_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: source_account_number
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: destination_bank_id
+                  type: BIGINT
+
+              - column:
+                  name: destination_account_number
+                  type: VARCHAR(50)
+
+              - column:
+                  name: amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: resulting_balance
+                  type: DECIMAL(19,2)
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: money_operations
+            columnNames: idempotency_key
+            constraintName: uk_money_operations_idempotency_key
+
+        - addForeignKeyConstraint:
+            baseTableName: money_operations
+            baseColumnNames: source_bank_id
+            referencedTableName: banks
+            referencedColumnNames: id
+            constraintName: fk_money_operations_source_bank
+            onDelete: RESTRICT

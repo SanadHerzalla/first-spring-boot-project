@@ -7,7 +7,18 @@ Content-Type: application/json
 }
 
 ### Get banks
-GET http://localhost:8080/api/v1/banks
+GET http://localhost:8080/api/v1/banks/1/accounts
+
+### Transfer
+POST http://localhost:8080/api/v1/banks/1/accounts/1111/transfer
+Content-Type: application/json
+Idempotency-Key: transfer-1111-1100-002
+
+{
+  "destinationBankId": 1,
+  "destinationAccountNumber": "1100",
+  "amount": 100
+}
 
 ### Create account
 POST http://localhost:8080/api/v1/banks/1/accounts
@@ -28,6 +39,7 @@ DELETE http://localhost:8080/api/v1/banks/1/accounts/777001
 ### Deposit
 POST http://localhost:8080/api/v1/banks/1/accounts/0011/deposit
 Content-Type: application/json
+Idempotency-Key: deposit-1111-004
 
 {
   "amount" : 1000000.00
@@ -36,8 +48,18 @@ Content-Type: application/json
 ### Withdraw
 POST http://localhost:8080/api/v1/banks/1/accounts/0011/withdraw
 Content-Type: application/json
+Idempotency-Key: withdraw-0011-002
 
 {
-  "amount": 300000.00
+  "amount": 30000.00
+}
+
+### Deposit
+POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
+Content-Type: application/json
+Idempotency-Key: deposit-1111-005
+
+{
+  "amount": 100
 }
 

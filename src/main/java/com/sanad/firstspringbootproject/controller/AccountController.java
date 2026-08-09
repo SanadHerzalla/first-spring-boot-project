@@ -3,9 +3,7 @@ package com.sanad.firstspringbootproject.controller;
 
 import com.sanad.firstspringbootproject.dto.MoneyOperationRequest;
 import com.sanad.firstspringbootproject.dto.PageResponse;
-import com.sanad.firstspringbootproject.dto.account.AccountResponse;
-import com.sanad.firstspringbootproject.dto.account.CreateAccountRequest;
-import com.sanad.firstspringbootproject.dto.account.UpdateAccountRequest;
+import com.sanad.firstspringbootproject.dto.account.*;
 import com.sanad.firstspringbootproject.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -49,12 +47,42 @@ public class AccountController {
     }
 
     @PostMapping("/{accountNumber}/deposit")
-    public AccountResponse deposit(@PathVariable long bankId, @PathVariable String accountNumber, @Valid @RequestBody MoneyOperationRequest request) {
-        return accountService.deposit(bankId, accountNumber, request.amount());
+    public AccountResponse deposit(
+            @PathVariable long bankId,
+            @PathVariable String accountNumber,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody MoneyOperationRequest request
+    ) {
+        return accountService.deposit(bankId, accountNumber, request.amount(), idempotencyKey);
+    }
+
+    @PostMapping("/{sourceAccountNumber}/transfer")
+    public TransferResponse transfer(
+            @PathVariable long bankId,
+
+            @PathVariable String sourceAccountNumber,
+
+            @RequestHeader("Idempotency-key")
+            String idempotencyKey,
+            @Valid @RequestBody TransferRequest request
+            ){
+        return accountService.transfer(
+                bankId,
+                sourceAccountNumber,
+                request.destinationBankId(),
+                request.destinationAccountNumber(),
+                request.amount(),
+                idempotencyKey
+        );
     }
 
     @PostMapping("/{accountNumber}/withdraw")
-    public AccountResponse withdraw(@PathVariable long bankId, @PathVariable String accountNumber, @Valid @RequestBody MoneyOperationRequest request) {
-        return accountService.withdraw(bankId, accountNumber, request.amount());
+    public AccountResponse withdraw(
+            @PathVariable long bankId,
+            @PathVariable String accountNumber,
+            @RequestHeader("Idempotency-Key")  String idempotencyKey,
+            @Valid @RequestBody MoneyOperationRequest request
+    ) {
+        return accountService.withdraw(bankId, accountNumber, request.amount(), idempotencyKey);
     }
 }
