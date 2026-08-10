@@ -10,11 +10,8 @@ import com.sanad.firstspringbootproject.repository.SpringDataBankRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -130,6 +127,28 @@ class BankServiceTest {
 
         verify(bankMapper)
                 .toResponse(any(Bank.class));
+    }
+
+    @Test
+    void shouldCleanBankNameBeforeCreating() {
+        when(bankRepository.existsByNormalizedName("jordan bank")).thenReturn(false);
+
+        when(bankRepository.saveAndFlush(any(Bank.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(bankMapper.toResponse(any(Bank.class))).thenReturn(new BankResponse(1L, "Jordan Bank", 0L));
+
+        bankService.createBank("   Jordan    Bank   ");
+
+        verify(bankRepository).existsByNormalizedName("jordan bank");
+    }
+
+    @Test
+    void shouldRejectDuplicateBank(){
+        when(bankRepository.existsByNormalizedName("jordan bank")).thenReturn(true);
+
+        assertThrows(DuplicateBankException.class, () -> bankService.createBank("jordan bank"));
+
+        verify(bankRepository, never()).saveAndFlush(any());
     }
 
 }

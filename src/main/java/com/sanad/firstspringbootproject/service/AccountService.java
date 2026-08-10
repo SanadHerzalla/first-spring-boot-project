@@ -123,7 +123,7 @@ public class AccountService {
         String accountNumber = cleanAccountNumber(requestedAccountNumber);
         String idempotencyKey = cleanIdempotencyKey(requestedIdempotencyKey);
 
-        int claimed = moneyOperationRepository.claimOperation(
+        int claimed = moneyOperationRepository. claimOperation(
                 idempotencyKey,
                 MoneyOperationType.DEPOSIT.name(),
                 bankId,
