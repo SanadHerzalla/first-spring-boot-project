@@ -86,7 +86,7 @@ public class AccountServiceTest {
                 1L
         );
 
-        when(bankRepository.findById(1L));
+        when(bankRepository.findById(1L)).thenReturn(Optional.of(bank));
 
         when(accountRepository.existsByBankIdAndAccountNumber(1L, "1111")).thenReturn(false);
 
