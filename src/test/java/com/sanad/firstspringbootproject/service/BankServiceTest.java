@@ -93,40 +93,23 @@ class BankServiceTest {
         String bankName = "Jordan Bank";
         String normalizedName = "jordan bank";
 
-        BankResponse expectedResponse =
-                new BankResponse(
-                        1L,
-                        bankName,
-                        0L
-                );
+        BankResponse expectedResponse = new BankResponse(1L, bankName, 0L);
 
-        when(
-                bankRepository.existsByNormalizedName(
-                        normalizedName
-                )
-        ).thenReturn(false);
+        when(bankRepository.existsByNormalizedName(normalizedName)).thenReturn(false);
 
-        when(bankRepository.saveAndFlush(any(Bank.class)))
-                .thenAnswer(invocation ->
-                        invocation.getArgument(0)
-                );
+        when(bankRepository.saveAndFlush(any(Bank.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(bankMapper.toResponse(any(Bank.class)))
-                .thenReturn(expectedResponse);
+        when(bankMapper.toResponse(any(Bank.class))).thenReturn(expectedResponse);
 
-        BankResponse result =
-                bankService.createBank(bankName);
+        BankResponse result = bankService.createBank(bankName);
 
         assertEquals(expectedResponse, result);
 
-        verify(bankRepository)
-                .existsByNormalizedName(normalizedName);
+        verify(bankRepository).existsByNormalizedName(normalizedName);
 
-        verify(bankRepository)
-                .saveAndFlush(any(Bank.class));
+        verify(bankRepository).saveAndFlush(any(Bank.class));
 
-        verify(bankMapper)
-                .toResponse(any(Bank.class));
+        verify(bankMapper).toResponse(any(Bank.class));
     }
 
     @Test
@@ -143,7 +126,7 @@ class BankServiceTest {
     }
 
     @Test
-    void shouldRejectDuplicateBank(){
+    void shouldRejectDuplicateBank() {
         when(bankRepository.existsByNormalizedName("jordan bank")).thenReturn(true);
 
         assertThrows(DuplicateBankException.class, () -> bankService.createBank("jordan bank"));

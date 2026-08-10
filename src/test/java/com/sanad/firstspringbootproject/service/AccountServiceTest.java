@@ -132,7 +132,7 @@ public class AccountServiceTest {
                 "1111",
                 "Bader",
                 AccountType.CURRENT,
-                new BigDecimal(600.00),
+                new BigDecimal("600.00"),
                 1L,
                 1L
         );
