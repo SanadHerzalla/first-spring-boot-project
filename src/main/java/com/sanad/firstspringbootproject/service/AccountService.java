@@ -216,6 +216,7 @@ public class AccountService {
     ) {
         validateAmount(amount);
 
+
         String sourceAccountNumber = cleanAccountNumber(requestedSourceAccountNumber);
         String destinationAccountNumber = cleanAccountNumber(requestedDestinationAccountNumber);
         String idempotencyKey = cleanIdempotencyKey(requestedIdempotencyKey);
@@ -258,8 +259,11 @@ public class AccountService {
         }
 
         Account updateSource = findAccount(sourceBankId, sourceAccountNumber);
+
         Account updateDestination = findAccount(destinationBankId, destinationAccountNumber);
+
         MoneyOperation operation = findMoneyOperation(idempotencyKey);
+
         operation.complete(updateSource.getBalance());
 
         return new TransferResponse(

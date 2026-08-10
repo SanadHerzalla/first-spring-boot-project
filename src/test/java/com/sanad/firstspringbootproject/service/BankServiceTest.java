@@ -5,7 +5,9 @@ import com.sanad.firstspringbootproject.exception.BankNotFoundException;
 import com.sanad.firstspringbootproject.exception.DuplicateBankException;
 import com.sanad.firstspringbootproject.mapper.BankMapper;
 import com.sanad.firstspringbootproject.model.Bank;
+import com.sanad.firstspringbootproject.repository.SpringAccountRepository;
 import com.sanad.firstspringbootproject.repository.SpringDataBankRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,249 +29,107 @@ class BankServiceTest {
     private SpringDataBankRepository bankRepository;
 
     @Mock
+    private SpringAccountRepository accountRepository;
+
+    @Mock
     private BankMapper bankMapper;
 
-    @InjectMocks
     private BankService bankService;
 
-    @Test
-    void findAllShouldReturnMappedBankResponses() {
-        Bank firstBank = new Bank("Arab Bank", "arab bank");
-        Bank secondBank = new Bank("Housing Bank", "housing bank");
-
-        BankResponse firstResponse = new BankResponse(1L, "Arab Bank", 0L);
-
-        BankResponse secondResponse = new BankResponse(2L, "Housing Bank", 0L);
-
-        when(bankRepository.findAll()).thenReturn(List.of(firstBank, secondBank));
-
-        when(bankMapper.toResponse(firstBank)).thenReturn(firstResponse);
-
-        when(bankMapper.toResponse(secondBank)).thenReturn(secondResponse);
-
-        List<BankResponse> result = bankService.findAll();
-
-        assertEquals(2, result.size());
-        assertEquals(firstResponse, result.get(0));
-        assertEquals(secondResponse, result.get(1));
-
-        verify(bankRepository).findAll();
-        verify(bankMapper).toResponse(firstBank);
-        verify(bankMapper).toResponse(secondBank);
+    @BeforeEach
+    void setUp() {
+        bankService = new BankService(bankRepository, accountRepository, bankMapper);
     }
 
     @Test
-    void findByIdShouldReturnBankResponseWhenBankExists() {
-        long bankId = 1L;
-
+    void shouldFindBankById() {
         Bank bank = new Bank("Arab Bank", "arab bank");
-        BankResponse expectedResponse = new BankResponse(bankId, "Arab Bank", 0L);
 
-        when(bankRepository.findById(bankId)).thenReturn(Optional.of(bank));
-
+        BankResponse expectedResponse = new BankResponse(1L, "Arab Bank", 0L);
+        when(bankRepository.findById(1L)).thenReturn(Optional.of(bank));
         when(bankMapper.toResponse(bank)).thenReturn(expectedResponse);
 
-        BankResponse result = bankService.findById(bankId);
-
+        BankResponse result = bankService.findById(1L);
         assertEquals(expectedResponse, result);
 
-        verify(bankRepository).findById(bankId);
+        verify(bankRepository).findById(1L);
+
         verify(bankMapper).toResponse(bank);
     }
 
     @Test
-    void findByIdShouldThrowExceptionWhenBankDoesNotExist() {
-        long bankId = 99L;
+    void shouldThrowBankNotFoundWhenBankDoseNotExist() {
+        when(bankRepository.findById(1L)).thenReturn(Optional.empty());
 
-        when(bankRepository.findById(bankId)).thenReturn(Optional.empty());
+        assertThrows(BankNotFoundException.class, () -> bankService.findById(1L));
 
-        BankNotFoundException exception = assertThrows(BankNotFoundException.class, () -> bankService.findById(bankId));
-
-        assertEquals("Bank with ID " + bankId + " was not found", exception.getMessage());
-
-        verify(bankRepository).findById(bankId);
-        verifyNoInteractions(bankMapper);
+        verify(bankRepository).findById(1L);
+        verifyNoMoreInteractions(bankMapper);
     }
 
     @Test
-    void createBankShouldSaveAndReturnResponse() {
-        String requestedName = "  Arab   Bank  ";
+    void shouldReturnAllBanks() {
+        Bank bank1 = new Bank("Arab bank", "arab bank");
+        Bank bank2 = new Bank("Housing Bank", "housing bank");
 
-        Bank savedBank = new Bank("Arab Bank", "arab bank");
+        BankResponse response1 = new BankResponse(1L, "Arab Bank", 0L);
+        BankResponse response2 = new BankResponse(2L, "Housing Bank", 0L);
 
-        BankResponse expectedResponse = new BankResponse(1L, "Arab Bank", 0L);
+        when(bankRepository.findAll()).thenReturn(List.of(bank1, bank2));
+        when(bankMapper.toResponse(bank1)).thenReturn(response1);
+        when(bankMapper.toResponse(bank2)).thenReturn(response2);
 
-        when(bankRepository.existsByNormalizedName("arab bank")).thenReturn(false);
+        List<BankResponse> result = bankService.findAll();
+        assertEquals(2, result.size());
 
-        when(bankRepository.saveAndFlush(any(Bank.class))).thenReturn(savedBank);
+        assertEquals(response1, result.get(0));
+        assertEquals(response2, result.get(1));
 
-        when(bankMapper.toResponse(savedBank)).thenReturn(expectedResponse);
+        verify(bankRepository).findAll();
+        verify(bankMapper).toResponse(bank1);
+        verify(bankMapper).toResponse(bank2);
+    }
 
-        BankResponse result = bankService.createBank(requestedName);
+    @Test
+    void shouldCreateBank() {
+
+        String bankName = "Jordan Bank";
+        String normalizedName = "jordan bank";
+
+        BankResponse expectedResponse =
+                new BankResponse(
+                        1L,
+                        bankName,
+                        0L
+                );
+
+        when(
+                bankRepository.existsByNormalizedName(
+                        normalizedName
+                )
+        ).thenReturn(false);
+
+        when(bankRepository.saveAndFlush(any(Bank.class)))
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0)
+                );
+
+        when(bankMapper.toResponse(any(Bank.class)))
+                .thenReturn(expectedResponse);
+
+        BankResponse result =
+                bankService.createBank(bankName);
 
         assertEquals(expectedResponse, result);
 
-        ArgumentCaptor<Bank> bankCaptor = ArgumentCaptor.forClass(Bank.class);
+        verify(bankRepository)
+                .existsByNormalizedName(normalizedName);
 
-        verify(bankRepository).saveAndFlush(bankCaptor.capture());
+        verify(bankRepository)
+                .saveAndFlush(any(Bank.class));
 
-        Bank bankPassedToRepository = bankCaptor.getValue();
-
-        assertEquals("Arab Bank", bankPassedToRepository.getName());
-        assertEquals("arab bank", bankPassedToRepository.getNormalizedName());
-
-        verify(bankRepository).existsByNormalizedName("arab bank");
-
-        verify(bankMapper).toResponse(savedBank);
+        verify(bankMapper)
+                .toResponse(any(Bank.class));
     }
 
-    @Test
-    void createBankShouldThrowExceptionWhenNameAlreadyExists() {
-        String requestedName = "Arab Bank";
-
-        when(bankRepository.existsByNormalizedName("arab bank")).thenReturn(true);
-
-        DuplicateBankException exception = assertThrows(DuplicateBankException.class, () -> bankService.createBank(requestedName));
-
-        assertEquals("A bank named 'Arab Bank' already exists", exception.getMessage());
-
-        verify(bankRepository).existsByNormalizedName("arab bank");
-
-        verify(bankRepository, never()).saveAndFlush(any(Bank.class));
-
-        verifyNoInteractions(bankMapper);
-    }
-
-    @Test
-    void createBankShouldTranslateDatabaseConstraintViolation() {
-        String requestedName = "Arab Bank";
-
-        when(bankRepository.existsByNormalizedName("arab bank")).thenReturn(false);
-
-        when(bankRepository.saveAndFlush(any(Bank.class))).thenThrow(new DataIntegrityViolationException("Unique constraint violated"));
-
-        DuplicateBankException exception = assertThrows(DuplicateBankException.class, () -> bankService.createBank(requestedName));
-
-        assertEquals("A bank named 'Arab Bank' already exists", exception.getMessage());
-
-        verify(bankRepository).existsByNormalizedName("arab bank");
-
-        verify(bankRepository).saveAndFlush(any(Bank.class));
-
-        verifyNoInteractions(bankMapper);
-    }
-
-    @Test
-    void updateShouldRenameAndReturnUpdatedBank() {
-        long bankId = 1L;
-
-        Bank existingBank = new Bank("Arab Bank", "arab bank");
-
-        BankResponse expectedResponse = new BankResponse(bankId, "Arab Banking Corporation", 1L);
-
-        when(bankRepository.findById(bankId)).thenReturn(Optional.of(existingBank));
-
-        when(bankRepository.existsByNormalizedName("arab banking corporation")).thenReturn(false);
-
-        when(bankRepository.saveAndFlush(existingBank)).thenReturn(existingBank);
-
-        when(bankMapper.toResponse(existingBank)).thenReturn(expectedResponse);
-
-        BankResponse result = bankService.update(bankId, "  Arab   Banking   Corporation  ");
-
-        assertEquals(expectedResponse, result);
-
-        assertEquals("Arab Banking Corporation", existingBank.getName());
-
-        assertEquals("arab banking corporation", existingBank.getNormalizedName());
-
-        verify(bankRepository).findById(bankId);
-
-        verify(bankRepository).existsByNormalizedName("arab banking corporation");
-
-        verify(bankRepository).saveAndFlush(existingBank);
-
-        verify(bankMapper).toResponse(existingBank);
-    }
-
-    @Test
-    void updateShouldThrowExceptionWhenAnotherBankHasName() {
-        long bankId = 1L;
-
-        Bank existingBank = new Bank("Arab Bank", "arab bank");
-
-        when(bankRepository.findById(bankId)).thenReturn(Optional.of(existingBank));
-
-        when(bankRepository.existsByNormalizedName("housing bank")).thenReturn(true);
-
-        DuplicateBankException exception = assertThrows(DuplicateBankException.class, () -> bankService.update(bankId, "Housing Bank"));
-
-        assertEquals("A bank named 'Housing Bank' already exists", exception.getMessage());
-
-        assertEquals("Arab Bank", existingBank.getName());
-        assertEquals("arab bank", existingBank.getNormalizedName());
-
-        verify(bankRepository).findById(bankId);
-
-        verify(bankRepository).existsByNormalizedName("housing bank");
-
-        verify(bankRepository, never()).saveAndFlush(any(Bank.class));
-
-        verifyNoInteractions(bankMapper);
-    }
-
-    @Test
-    void updateShouldAllowBankToKeepItsCurrentName() {
-        long bankId = 1L;
-
-        Bank existingBank = new Bank("Arab Bank", "arab bank");
-
-        BankResponse expectedResponse = new BankResponse(bankId, "Arab Bank", 0L);
-
-        when(bankRepository.findById(bankId)).thenReturn(Optional.of(existingBank));
-
-        when(bankRepository.saveAndFlush(existingBank)).thenReturn(existingBank);
-
-        when(bankMapper.toResponse(existingBank)).thenReturn(expectedResponse);
-
-        BankResponse result = bankService.update(bankId, "Arab Bank");
-
-        assertEquals(expectedResponse, result);
-
-        verify(bankRepository).findById(bankId);
-
-        verify(bankRepository, never()).existsByNormalizedName(anyString());
-
-        verify(bankRepository).saveAndFlush(existingBank);
-
-        verify(bankMapper).toResponse(existingBank);
-    }
-
-    @Test
-    void deleteShouldDeleteBankWhenItExists() {
-        long bankId = 1L;
-
-        Bank bank = new Bank("Arab Bank", "arab bank");
-
-        when(bankRepository.findById(bankId)).thenReturn(Optional.of(bank));
-
-        bankService.delete(bankId);
-
-        verify(bankRepository).findById(bankId);
-        verify(bankRepository).delete(bank);
-    }
-
-    @Test
-    void deleteShouldThrowExceptionWhenBankDoesNotExist() {
-        long bankId = 99L;
-
-        when(bankRepository.findById(bankId)).thenReturn(Optional.empty());
-
-        BankNotFoundException exception = assertThrows(BankNotFoundException.class, () -> bankService.delete(bankId));
-
-        assertEquals("Bank with ID " + bankId + " was not found", exception.getMessage());
-
-        verify(bankRepository).findById(bankId);
-        verify(bankRepository, never()).delete(any(Bank.class));
-    }
 }

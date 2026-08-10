@@ -12,12 +12,12 @@ GET http://localhost:8080/api/v1/banks/1/accounts
 ### Transfer
 POST http://localhost:8080/api/v1/banks/1/accounts/1111/transfer
 Content-Type: application/json
-Idempotency-Key: transfer-1111-1100-002
+Idempotency-Key: transfer-1111-1100-005
 
 {
   "destinationBankId": 1,
   "destinationAccountNumber": "1100",
-  "amount": 100
+  "amount": 2000
 }
 
 ### Create account
