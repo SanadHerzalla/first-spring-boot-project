@@ -1,42 +1,53 @@
 services:
+
   app:
     build: .
     container_name: spring-bank-app
     ports:
       - "8080:8080"
+
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_bank_db
       SPRING_DATASOURCE_USERNAME: sanad
-      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_PASSWORD: "1234"
 
       SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
       SPRING_ARTEMIS_USER: sanad
-      SPRING_ARTEMIS_PASSWORD: 1234
+      SPRING_ARTEMIS_PASSWORD: "1234"
+
     depends_on:
       - postgres
       - artemis
 
+
   postgres:
     image: postgres:16
     container_name: postgres-bank
+
     environment:
       POSTGRES_USER: sanad
-      POSTGRES_PASSWORD: progressoft
+      POSTGRES_PASSWORD: "1234"
       POSTGRES_DB: spring_bank_db
+
     ports:
       - "5433:5432"
+
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+
   artemis:
-      image: apache/activemq-artemis:latest
-      container_name: artemis-bank
-      environment:
-        ARTEMIS_USERNAME: sanad
-        ARTEMIS_PASSWORD: 1234
-      ports:
-       - "61616:61616"
-       - "8161:8161"
+    image: apache/activemq-artemis:2.44.0
+    container_name: artemis-bank
+
+    environment:
+      ARTEMIS_USER: sanad
+      ARTEMIS_PASSWORD: "1234"
+
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+
 
 volumes:
   postgres-data:

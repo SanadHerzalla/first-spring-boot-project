@@ -8,11 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface MoneyOperationRepository extends JpaRepository<MoneyOperation, Long> {
 
     Optional<MoneyOperation> findByIdempotencyKey(String idempotencyKey);
+    List<MoneyOperation> findTop10ByPublishedFalseOrderByIdAsc();
 
     @Modifying
     @Query(value = """

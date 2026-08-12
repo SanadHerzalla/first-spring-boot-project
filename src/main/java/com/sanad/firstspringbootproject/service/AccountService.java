@@ -1,5 +1,6 @@
 package com.sanad.firstspringbootproject.service;
 
+import com.sanad.firstspringbootproject.dto.PageResponse;
 import com.sanad.firstspringbootproject.dto.account.AccountResponse;
 import com.sanad.firstspringbootproject.dto.account.TransferResponse;
 import com.sanad.firstspringbootproject.exception.*;
@@ -9,13 +10,12 @@ import com.sanad.firstspringbootproject.repository.MoneyOperationRepository;
 import com.sanad.firstspringbootproject.repository.SpringAccountRepository;
 import com.sanad.firstspringbootproject.repository.SpringDataBankRepository;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.sanad.firstspringbootproject.dto.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,12 +29,7 @@ public class AccountService {
     private final SpringDataBankRepository bankRepository;
     private final AccountMapper accountMapper;
 
-    public AccountService(
-            SpringAccountRepository accountRepository,
-            SpringDataBankRepository bankRepository,
-            MoneyOperationRepository moneyOperationRepository,
-            AccountMapper accountMapper
-    ) {
+    public AccountService(SpringAccountRepository accountRepository, SpringDataBankRepository bankRepository, MoneyOperationRepository moneyOperationRepository, AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
         this.bankRepository = bankRepository;
         this.accountMapper = accountMapper;
@@ -52,14 +47,7 @@ public class AccountService {
 
         List<AccountResponse> content = accountPage.getContent().stream().map(accountMapper::toResponse).toList();
 
-        return new PageResponse<>(
-                content,
-                accountPage.getNumber(),
-                accountPage.getSize(),
-                accountPage.getTotalElements(),
-                accountPage.getTotalPages(),
-                accountPage.isFirst(),
-                accountPage.isLast());
+        return new PageResponse<>(content, accountPage.getNumber(), accountPage.getSize(), accountPage.getTotalElements(), accountPage.getTotalPages(), accountPage.isFirst(), accountPage.isLast());
     }
 
     public AccountResponse findByAccountNumber(long bankId, String requestedAccountNumber) {
@@ -123,24 +111,10 @@ public class AccountService {
         String accountNumber = cleanAccountNumber(requestedAccountNumber);
         String idempotencyKey = cleanIdempotencyKey(requestedIdempotencyKey);
 
-        int claimed = moneyOperationRepository. claimOperation(
-                idempotencyKey,
-                MoneyOperationType.DEPOSIT.name(),
-                bankId,
-                accountNumber,
-                null,
-                null,
-                amount
-        );
+        int claimed = moneyOperationRepository.claimOperation(idempotencyKey, MoneyOperationType.DEPOSIT.name(), bankId, accountNumber, null, null, amount);
 
         if (claimed == 0) {
-            return handleRepeatedOperation(
-                    idempotencyKey,
-                    MoneyOperationType.DEPOSIT,
-                    bankId,
-                    accountNumber,
-                    amount
-            );
+            return handleRepeatedOperation(idempotencyKey, MoneyOperationType.DEPOSIT, bankId, accountNumber, amount);
         }
 
         int updatedRows = accountRepository.deposit(bankId, accountNumber, amount);
@@ -159,34 +133,15 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponse withdraw(
-            long bankId,
-            String requestedAccountNumber,
-            BigDecimal amount,
-            String requestedIdempotencyKey
-    ) {
+    public AccountResponse withdraw(long bankId, String requestedAccountNumber, BigDecimal amount, String requestedIdempotencyKey) {
         validateAmount(amount);
         String accountNumber = cleanAccountNumber(requestedAccountNumber);
         String idempotencyKey = cleanIdempotencyKey(requestedIdempotencyKey);
 
-        int claimed = moneyOperationRepository.claimOperation(
-                idempotencyKey,
-                MoneyOperationType.WITHDRAW.name(),
-                bankId,
-                accountNumber,
-                null,
-                null,
-                amount
-        );
+        int claimed = moneyOperationRepository.claimOperation(idempotencyKey, MoneyOperationType.WITHDRAW.name(), bankId, accountNumber, null, null, amount);
 
         if (claimed == 0) {
-            return handleRepeatedOperation(
-                    idempotencyKey,
-                    MoneyOperationType.WITHDRAW,
-                    bankId,
-                    accountNumber,
-                    amount
-            );
+            return handleRepeatedOperation(idempotencyKey, MoneyOperationType.WITHDRAW, bankId, accountNumber, amount);
         }
 
         int updatedRows = accountRepository.withdraw(bankId, accountNumber, amount);
@@ -206,14 +161,7 @@ public class AccountService {
     }
 
     @Transactional
-    public TransferResponse transfer(
-            long sourceBankId,
-            String requestedSourceAccountNumber,
-            long destinationBankId,
-            String requestedDestinationAccountNumber,
-            BigDecimal amount,
-            String requestedIdempotencyKey
-    ) {
+    public TransferResponse transfer(long sourceBankId, String requestedSourceAccountNumber, long destinationBankId, String requestedDestinationAccountNumber, BigDecimal amount, String requestedIdempotencyKey) {
         validateAmount(amount);
 
 
@@ -224,25 +172,10 @@ public class AccountService {
         validateDifferentAccounts(sourceBankId, sourceAccountNumber, destinationBankId, destinationAccountNumber);
         findAccount(destinationBankId, destinationAccountNumber);
 
-        int claimed = moneyOperationRepository.claimOperation(
-                idempotencyKey,
-                MoneyOperationType.TRANSFER.name(),
-                sourceBankId,
-                sourceAccountNumber,
-                destinationBankId,
-                destinationAccountNumber,
-                amount
-        );
+        int claimed = moneyOperationRepository.claimOperation(idempotencyKey, MoneyOperationType.TRANSFER.name(), sourceBankId, sourceAccountNumber, destinationBankId, destinationAccountNumber, amount);
 
         if (claimed == 0) {
-            return handleRepeatedTransfer(
-                    idempotencyKey,
-                    sourceBankId,
-                    sourceAccountNumber,
-                    destinationBankId,
-                    destinationAccountNumber,
-                    amount
-            );
+            return handleRepeatedTransfer(idempotencyKey, sourceBankId, sourceAccountNumber, destinationBankId, destinationAccountNumber, amount);
         }
 
         int withdrawnRows = accountRepository.withdraw(sourceBankId, sourceAccountNumber, amount);
@@ -266,11 +199,7 @@ public class AccountService {
 
         operation.complete(updateSource.getBalance());
 
-        return new TransferResponse(
-                accountMapper.toResponse(updateSource),
-                accountMapper.toResponse(updateDestination),
-                amount
-        );
+        return new TransferResponse(accountMapper.toResponse(updateSource), accountMapper.toResponse(updateDestination), amount);
 
     }
 
@@ -316,24 +245,10 @@ public class AccountService {
         }
     }
 
-    private TransferResponse handleRepeatedTransfer(
-            String idempotencyKey,
-            long sourceBankId,
-            String sourceAccountNumber,
-            long destinationBankId,
-            String destinationAccountNumber,
-            BigDecimal amount
-    ) {
+    private TransferResponse handleRepeatedTransfer(String idempotencyKey, long sourceBankId, String sourceAccountNumber, long destinationBankId, String destinationAccountNumber, BigDecimal amount) {
         MoneyOperation operation = findMoneyOperation(idempotencyKey);
 
-        boolean sameRequest = operation.matches(
-                MoneyOperationType.TRANSFER,
-                sourceBankId,
-                sourceAccountNumber,
-                destinationBankId,
-                destinationAccountNumber,
-                amount
-        );
+        boolean sameRequest = operation.matches(MoneyOperationType.TRANSFER, sourceBankId, sourceAccountNumber, destinationBankId, destinationAccountNumber, amount);
 
         if (!sameRequest) {
             throw new IdempotencyConflictException(idempotencyKey);
@@ -347,30 +262,12 @@ public class AccountService {
         Account destination = findAccount(destinationBankId, destinationAccountNumber);
         AccountResponse sourceResponse = accountMapper.toResponse(source);
 
-        sourceResponse = new AccountResponse(
-                sourceResponse.id(),
-                sourceResponse.accountNumber(),
-                sourceResponse.ownerName(),
-                sourceResponse.accountType(),
-                operation.getResultingBalance(),
-                sourceResponse.version(),
-                sourceResponse.bankId()
-        );
+        sourceResponse = new AccountResponse(sourceResponse.id(), sourceResponse.accountNumber(), sourceResponse.ownerName(), sourceResponse.accountType(), operation.getResultingBalance(), sourceResponse.version(), sourceResponse.bankId());
 
-        return new TransferResponse(
-                sourceResponse,
-                accountMapper.toResponse(destination),
-                amount
-        );
+        return new TransferResponse(sourceResponse, accountMapper.toResponse(destination), amount);
     }
 
-    private AccountResponse handleRepeatedOperation(
-            String idempotencyKey,
-            MoneyOperationType operationType,
-            long bankId,
-            String accountNumber,
-            BigDecimal amount
-    ) {
+    private AccountResponse handleRepeatedOperation(String idempotencyKey, MoneyOperationType operationType, long bankId, String accountNumber, BigDecimal amount) {
         MoneyOperation operation = findMoneyOperation(idempotencyKey);
 
         boolean sameRequest = operation.matches(operationType, bankId, accountNumber, null, null, amount);
@@ -385,15 +282,7 @@ public class AccountService {
 
         Account account = findAccount(bankId, accountNumber);
 
-        return new AccountResponse(
-                account.getId(),
-                account.getAccountNumber(),
-                account.getOwnerName(),
-                account.getAccountType(),
-                operation.getResultingBalance(),
-                account.getVersion(),
-                account.getBank().getId()
-        );
+        return new AccountResponse(account.getId(), account.getAccountNumber(), account.getOwnerName(), account.getAccountType(), operation.getResultingBalance(), account.getVersion(), account.getBank().getId());
     }
 
     private MoneyOperation findMoneyOperation(String idempotencyKey) {

@@ -78,6 +78,9 @@ public class MoneyOperation {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @Column(nullable = false)
+    private boolean published = false;
+
     protected MoneyOperation() {}
 
     public MoneyOperation(
@@ -145,6 +148,14 @@ public class MoneyOperation {
 
     public Long getId() {
         return id;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void markPublished() {
+        this.published = true;
     }
 
     public MoneyOperationType getOperationType() {

@@ -1,4 +1,5 @@
 package com.sanad.firstspringbootproject.JMS.queue;
+import com.sanad.firstspringbootproject.JMS.job.StatementJob;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,8 @@ public class StatementProducer {
         this.jmsTemplate = jmsTemplate;
     }
 
-    public void requestProducer(Long accountNumber) {
-        jmsTemplate.convertAndSend("statement-queue", accountNumber);
+    public void requestStatement(Long bankId, String accountNumber) {
+        StatementJob statementJob = new StatementJob(bankId, accountNumber);
+        jmsTemplate.convertAndSend("statement-queue", statementJob);
     }
 }

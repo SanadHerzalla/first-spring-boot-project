@@ -20,8 +20,8 @@ public class JmsTestController {
     }
 
     @GetMapping("/queue")
-    public String queue(@RequestParam Long accountNumber) {
-        statementProducer.requestProducer(accountNumber);
+    public String queue(@RequestParam Long bankId, @RequestParam String accountNumber) {
+        statementProducer.requestStatement(bankId, accountNumber);
         return "Statement request sent for account: " + accountNumber;
     }
 

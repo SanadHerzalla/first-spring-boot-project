@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-add-published-to-money-operations
+      author: sanad
+
+      changes:
+        - addColumn:
+            tableName: money_operations
+            columns:
+              - column:
+                  name: published
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
