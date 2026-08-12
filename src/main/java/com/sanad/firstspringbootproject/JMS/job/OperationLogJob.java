@@ -3,6 +3,8 @@ package com.sanad.firstspringbootproject.JMS.job;
 import com.sanad.firstspringbootproject.JMS.queue.OperationProducer;
 import com.sanad.firstspringbootproject.model.MoneyOperation;
 import com.sanad.firstspringbootproject.repository.MoneyOperationRepository;
+import com.sanad.firstspringbootproject.service.OperationClaimService;
+import com.sanad.firstspringbootproject.service.OperationWorker;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,32 +12,21 @@ import java.util.List;
 
 @Component
 public class OperationLogJob {
-    private final MoneyOperationRepository moneyOperationRepository;
-    private final OperationProducer operationProducer;
-    public OperationLogJob(MoneyOperationRepository moneyOperationRepository,  OperationProducer operationProducer) {
-        this.moneyOperationRepository = moneyOperationRepository;
-        this.operationProducer = operationProducer;
+    private final OperationClaimService  operationClaimService;
+    private final OperationWorker worker;
+    public OperationLogJob(OperationClaimService operationClaimService , OperationWorker worker) {
+        this.operationClaimService = operationClaimService;
+        this.worker = worker;
     }
 
-    @Scheduled(fixedDelay = 10000, fixedRate = 10000)
+    @Scheduled(fixedDelay = 1000)
     public void publishOperations() {
-        System.out.println("Operation job started");
-        List<MoneyOperation> operations = moneyOperationRepository.findTop10ByPublishedFalseOrderByIdAsc();
-        System.out.println("Found " + operations.size() + " unpublished operations");
+        List<Long> operations = operationClaimService.claimOperations(10);
 
-        for (MoneyOperation operation : operations) {
-            System.out.println("Preparing operation ID: " + operation.getId());
+        System.out.println("Claimed: " + operations.size() + " operations");
 
-            OperationJob job = new OperationJob(
-                    operation.getId(),
-                    operation.getOperationType().name(),
-                    operation.getSourceBankId(),
-                    operation.getSourceAccountNumber(),
-                    operation.getAmount()
-            );
-            operationProducer.send(job);
-            operation.markPublished();
-            moneyOperationRepository.save(operation);
+        for (Long operationId : operations) {
+            worker.process(operationId);
         }
     }
 }

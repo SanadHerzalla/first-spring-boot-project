@@ -14,7 +14,6 @@ import java.util.Optional;
 public interface MoneyOperationRepository extends JpaRepository<MoneyOperation, Long> {
 
     Optional<MoneyOperation> findByIdempotencyKey(String idempotencyKey);
-    List<MoneyOperation> findTop10ByPublishedFalseOrderByIdAsc();
 
     @Modifying
     @Query(value = """
@@ -54,10 +53,18 @@ public interface MoneyOperationRepository extends JpaRepository<MoneyOperation, 
 
                        @Param("destinationBankId") Long destinationBankId,
 
-                       @Param("destinationAccountNumber")
-                       String destinationAccountNumber,
+                       @Param("destinationAccountNumber") String destinationAccountNumber,
 
                        @Param("amount") BigDecimal amount);
 
     String id(Long id);
+
+    @Query(value = """
+           SELECT * FROM money_operations
+           WHERE publish_status = 'PENDING'
+           ORDER BY id ASC
+           FOR UPDATE SKIP LOCKED
+           LIMIT 10
+           """, nativeQuery = true)
+    List<MoneyOperation> findOperationsToClaim(@Param("limit") int limit);
 }

@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-publish-status
+      author: sanad
+
+      changes:
+        - addColumn:
+            tableName: money_operations
+            columns:
+              - column:
+                  name: publish_status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false

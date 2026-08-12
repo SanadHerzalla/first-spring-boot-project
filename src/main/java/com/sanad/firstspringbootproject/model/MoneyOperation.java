@@ -78,8 +78,9 @@ public class MoneyOperation {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean published = false;
+    private PublishStatus publishStatus = PublishStatus.PENDING;
 
     protected MoneyOperation() {}
 
@@ -150,12 +151,16 @@ public class MoneyOperation {
         return id;
     }
 
-    public boolean isPublished() {
-        return published;
+    public void markPublished() {
+        this.publishStatus = PublishStatus.PUBLISHED;
     }
 
-    public void markPublished() {
-        this.published = true;
+    public void markProcessing() {
+        this.publishStatus = PublishStatus.PROCESSING;
+    }
+
+    public void markPending() {
+        this.publishStatus = PublishStatus.PENDING;
     }
 
     public MoneyOperationType getOperationType() {

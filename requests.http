@@ -39,16 +39,16 @@ DELETE http://localhost:8080/api/v1/banks/1/accounts/777001
 ### Deposit
 POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
 Content-Type: application/json
-Idempotency-Key: deposit-1111-006
+Idempotency-Key: deposit-1111-015
 
 {
-  "amount" : 1000000.00
+  "amount" : 1.00
 }
 
 ### Withdraw
 POST http://localhost:8080/api/v1/banks/1/accounts/1100/withdraw
 Content-Type: application/json
-Idempotency-Key: withdraw-0011-002
+Idempotency-Key: withdraw-0011-060
 
 {
   "amount": 30000.00
@@ -57,7 +57,7 @@ Idempotency-Key: withdraw-0011-002
 ### Deposit
 POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
 Content-Type: application/json
-Idempotency-Key: deposit-1111-009
+Idempotency-Key: deposit-1111-201
 
 {
   "amount": 100
