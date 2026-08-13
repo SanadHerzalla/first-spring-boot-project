@@ -11,20 +11,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class OperationWorker {
     private final MoneyOperationRepository moneyOperationRepository;
-    private final OperationProducer operationProducer;
 
-    public  OperationWorker(MoneyOperationRepository moneyOperationRepository, OperationProducer operationProducer) {
+    public OperationWorker(MoneyOperationRepository moneyOperationRepository) {
         this.moneyOperationRepository = moneyOperationRepository;
-        this.operationProducer = operationProducer;
     }
-
     @Async("operationExecutor")
     @Transactional
     public void process(MoneyOperation operation){
         System.out.println(
                 Thread.currentThread().getName() + " processing operations " + operation.getId()
         );
-
         try {
             System.out.println("Operation is processed");
             operation.markPublished();
@@ -33,6 +29,5 @@ public class OperationWorker {
             operation.markPending();
             moneyOperationRepository.save(operation);
         }
-
     }
 }
