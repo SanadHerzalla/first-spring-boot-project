@@ -19,3 +19,6 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/changes/007-remove-published-column.yaml
+
+  - include:
+      file: db/changelog/changes/008-add-updated-at-to-money-operations.yaml

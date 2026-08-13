@@ -29,6 +29,11 @@ services:
       POSTGRES_PASSWORD: "1234"
       POSTGRES_DB: spring_bank_db
 
+    command:
+      - postgres
+      - -c
+      - timezone=Asia/Amman
+
     ports:
       - "5433:5432"
 

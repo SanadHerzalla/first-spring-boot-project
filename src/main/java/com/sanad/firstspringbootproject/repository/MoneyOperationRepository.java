@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,14 +57,22 @@ public interface MoneyOperationRepository extends JpaRepository<MoneyOperation, 
 
                        @Param("amount") BigDecimal amount);
 
-    String id(Long id);
-
+    @Transactional
     @Query(value = """
-           SELECT * FROM money_operations
-           WHERE publish_status = 'PENDING'
-           ORDER BY id ASC
-           FOR UPDATE SKIP LOCKED
-           LIMIT 10
-           """, nativeQuery = true)
-    List<MoneyOperation> findOperationsToClaim(@Param("limit") int limit);
+            WITH claimed AS (
+            SELECT id 
+            FROM money_operations
+            WHERE publish_status = 'PENDING'
+            ORDER BY id ASC
+            FOR UPDATE SKIP LOCKED
+            LIMIT :limit
+            )
+            UPDATE money_operations mo
+            SET publish_status = 'PROCESSING',
+                updated_at = CURRENT_TIMESTAMP
+            FROM claimed 
+            WHERE mo.id = claimed.id 
+            RETURNING mo.*
+            """, nativeQuery = true)
+    List<MoneyOperation> claimOperations(@Param("limit") int limit);
 }

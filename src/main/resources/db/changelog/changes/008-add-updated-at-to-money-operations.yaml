@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-add-updated-at-to-money-operations
+      author: sanad
+
+      changes:
+        - addColumn:
+            tableName: money_operations
+            columns:
+              - column:
+                  name: updated_at
+                  type: JAVA.SQL.TYPES.TIMESTAMP_WITH_TIMEZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
