@@ -1,0 +1,36 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 009-create-claim-operations-function
+      author: sanad
+
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION claim_money_operations(p_batch_size INTEGER)
+              RETURNS SETOF money_operations
+              LANGUAGE plpgsql
+              AS $$
+              BEGIN
+
+                  RETURN QUERY
+
+                  WITH claimed AS (
+                      SELECT id
+                      FROM money_operations
+                      WHERE publish_status = 'PENDING'
+                      ORDER BY id ASC
+                      FOR UPDATE SKIP LOCKED
+                      LIMIT p_batch_size
+                  )
+
+                  UPDATE money_operations mo
+                  SET publish_status = 'PROCESSING',
+                      updated_at = CURRENT_TIMESTAMP
+                  FROM claimed
+                  WHERE mo.id = claimed.id
+                  RETURNING mo.*;
+
+              END;
+              $$;

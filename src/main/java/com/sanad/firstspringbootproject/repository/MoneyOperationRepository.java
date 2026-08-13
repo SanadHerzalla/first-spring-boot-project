@@ -57,22 +57,4 @@ public interface MoneyOperationRepository extends JpaRepository<MoneyOperation, 
 
                        @Param("amount") BigDecimal amount);
 
-    @Transactional
-    @Query(value = """
-            WITH claimed AS (
-            SELECT id 
-            FROM money_operations
-            WHERE publish_status = 'PENDING'
-            ORDER BY id ASC
-            FOR UPDATE SKIP LOCKED
-            LIMIT :limit
-            )
-            UPDATE money_operations mo
-            SET publish_status = 'PROCESSING',
-                updated_at = CURRENT_TIMESTAMP
-            FROM claimed 
-            WHERE mo.id = claimed.id 
-            RETURNING mo.*
-            """, nativeQuery = true)
-    List<MoneyOperation> claimOperations(@Param("limit") int limit);
 }

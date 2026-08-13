@@ -1,7 +1,6 @@
 package com.sanad.firstspringbootproject.service;
 
 
-import com.sanad.firstspringbootproject.JMS.queue.OperationProducer;
 import com.sanad.firstspringbootproject.model.MoneyOperation;
 import com.sanad.firstspringbootproject.repository.MoneyOperationRepository;
 import jakarta.transaction.Transactional;
