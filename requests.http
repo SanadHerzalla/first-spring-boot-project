@@ -1,13 +1,14 @@
 ### Create Bank
 POST http://localhost:8080/api/v1/banks
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3MTQzNTMwLCJleHAiOjE3ODcxNDcxMzB9.EZVAIn0Np36bkSVZN1NxTwwiM6nNh6y5D0U8PlOA9O0
 
 {
-  "name": "Safwa Bank"
+  "name": "Arab Bank"
 }
 
 ### Get banks
-GET http://localhost:8080/api/v1/banks/1/accounts
+GET http://localhost:8080/api/v1/banks
 
 ### Transfer
 POST http://localhost:8080/api/v1/banks/1/accounts/1100/transfer
@@ -39,19 +40,19 @@ DELETE http://localhost:8080/api/v1/banks/1/accounts/777001
 ### Deposit
 POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
 Content-Type: application/json
-Idempotency-Key: deposit-1111-102
+Idempotency-Key: deposit-1111-001
 
 {
-  "amount" : 1.00
+  "amount" : 5000.00
 }
 
 ### Withdraw
-POST http://localhost:8080/api/v1/banks/1/accounts/1100/withdraw
+POST http://localhost:8080/api/v1/banks/1/accounts/1111/withdraw
 Content-Type: application/json
-Idempotency-Key: withdraw-0011-101
+Idempotency-Key: withdraw-1111-001
 
 {
-  "amount": 30000.00
+  "amount": 300.00
 }
 
 ### Deposit
@@ -63,3 +64,34 @@ Idempotency-Key: deposit-1111-203
   "amount": 100
 }
 
+### register request
+POST http://localhost:8080/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "Amir",
+  "password": "password123"
+}
+
+### login request
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "Rabee",
+  "password": "progressoft"
+}
+
+
+### Login
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "Amir",
+  "password": "password123"
+}
+
+### Get banks
+GET http://localhost:8080/api/v1/banks
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3MTQzNDA0LCJleHAiOjE3ODcxNDcwMDR9.bAGXJm2LbsU0Vc62aHdlSDm7K2gFlJwhvJ1o1CVYhQA

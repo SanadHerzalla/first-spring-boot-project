@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bank-config
+data:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_bank_db
+  SPRING_ARTEMIS_MODE: native
+  SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+  TZ: Asia/Amman

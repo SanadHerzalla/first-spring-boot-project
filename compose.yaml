@@ -9,7 +9,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_bank_db
       SPRING_DATASOURCE_USERNAME: sanad
-      SPRING_DATASOURCE_PASSWORD: "1234"
+      SPRING_DATASOURCE_PASSWORD: "progressoft"
 
       SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
       SPRING_ARTEMIS_USER: sanad

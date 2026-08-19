@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-bank-app
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: spring-bank-app
+
+  template:
+    metadata:
+      labels:
+        app: spring-bank-app
+
+    spec:
+      containers:
+        - name: spring-bank-app
+          image: sanad/spring-bank-app:1.16
+
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: bank-config
+
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secret
+                  key: JWT_SECRET
+            - name: JWT_EXPIRATION
+              value: "3600000"
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secret
+                  key: DB_USERNAME
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secret
+                  key: DB_PASSWORD
+
+            - name: SPRING_ARTEMIS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secret
+                  key: ARTEMIS_USER
+
+            - name: SPRING_ARTEMIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secret
+                  key: ARTEMIS_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-bank-service
+
+spec:
+  selector:
+    app: spring-bank-app
+
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+  type: ClusterIP
+
+
