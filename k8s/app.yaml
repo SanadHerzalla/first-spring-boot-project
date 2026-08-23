@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: spring-bank-app
-          image: sanad/spring-bank-app:1.16
+          image: sanad/spring-bank-app:rbac-v1
 
           ports:
             - containerPort: 8080

@@ -1,97 +1,52 @@
-### Create Bank
-POST http://localhost:8080/api/v1/banks
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3MTQzNTMwLCJleHAiOjE3ODcxNDcxMzB9.EZVAIn0Np36bkSVZN1NxTwwiM6nNh6y5D0U8PlOA9O0
+### Get Banks
+GET https://bank.local/api/v1/banks
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3NDcyNDQ4LCJleHAiOjE3ODc0NzYwNDh9.qEiYjfoFlMwSYPE-1cXE2cjQHIHmJgNllz1AmhLJokI
 
-{
-  "name": "Arab Bank"
-}
-
-### Get banks
-GET http://localhost:8080/api/v1/banks
-
-### Transfer
-POST http://localhost:8080/api/v1/banks/1/accounts/1100/transfer
-Content-Type: application/json
-Idempotency-Key: transfer-1111-1100-006
-
-{
-  "destinationBankId": 1,
-  "destinationAccountNumber": "1111",
-  "amount": 2000
-}
-
-### Create account
-POST http://localhost:8080/api/v1/banks/1/accounts
-Content-Type: application/json
-
-{
-  "ownerName": "Sanad",
-  "accountNumber": "1111",
-  "accountType": "CURRENT"
-}
-
-### Delete bank
-DELETE http://localhost:8080/api/v1/banks/3
-
-### Delete account
-DELETE http://localhost:8080/api/v1/banks/1/accounts/777001
-
-### Deposit
-POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
-Content-Type: application/json
-Idempotency-Key: deposit-1111-001
-
-{
-  "amount" : 5000.00
-}
-
-### Withdraw
-POST http://localhost:8080/api/v1/banks/1/accounts/1111/withdraw
-Content-Type: application/json
-Idempotency-Key: withdraw-1111-001
-
-{
-  "amount": 300.00
-}
-
-### Deposit
-POST http://localhost:8080/api/v1/banks/1/accounts/1111/deposit
-Content-Type: application/json
-Idempotency-Key: deposit-1111-203
-
-{
-  "amount": 100
-}
-
-### register request
-POST http://localhost:8080/api/v1/auth/register
-Content-Type: application/json
-
-{
-  "username": "Amir",
-  "password": "password123"
-}
-
-### login request
-POST http://localhost:8080/api/v1/auth/login
+### Register
+POST https://bank.local/api/v1/auth/register
 Content-Type: application/json
 
 {
   "username": "Rabee",
-  "password": "progressoft"
+  "password": "password1234"
 }
 
 
-### Login
-POST http://localhost:8080/api/v1/auth/login
+### Login using ingress
+POST https://bank.local/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "Amir",
-  "password": "password123"
+  "username": "Rabee",
+  "password": "password1234"
 }
 
-### Get banks
-GET http://localhost:8080/api/v1/banks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3MTQzNDA0LCJleHAiOjE3ODcxNDcwMDR9.bAGXJm2LbsU0Vc62aHdlSDm7K2gFlJwhvJ1o1CVYhQA
+
+### Create Bank
+POST https://bank.local/api/v1/banks
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJTYW5hZCIsImlhdCI6MTc4NzQ3MjQwOCwiZXhwIjoxNzg3NDc2MDA4fQ.4VheuB5cOaqZtBhLuWFzSpBp4Es7OF-WxN6fKAE2iBk
+
+{
+  "name": "ajib"
+}
+
+### Create Account
+POST https://bank.local/api/v1/banks/1/accounts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJSYWJlZSIsImlhdCI6MTc4NzQ3NDYzMCwiZXhwIjoxNzg3NDc4MjMwfQ.9jkpwvfQzLssCIk4Atj2TGhJYkerHhWlHR594rrDDYU
+
+{
+  "ownerName": "Sanad",
+  "accountNumber": "0000",
+  "accountType": "CURRENT"
+}
+
+### test https
+POST https://bank.local/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "Sanad",
+  "password": "password123"
+}
