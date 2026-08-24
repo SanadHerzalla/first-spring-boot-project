@@ -49,9 +49,9 @@ public class BankController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteBank(@PathVariable long id) {
+    public ResponseEntity<String> deleteBank(@PathVariable long id) {
         bankService.delete(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Bank deleted successfully");
     }
 }

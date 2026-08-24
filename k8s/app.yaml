@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: spring-bank-app
-          image: sanad/spring-bank-app:rbac-v1
+          image: sanad/spring-bank-app:rbac-v2
 
           ports:
             - containerPort: 8080
@@ -74,5 +74,3 @@ spec:
       targetPort: 8080
 
   type: ClusterIP
-
-

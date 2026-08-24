@@ -1,6 +1,6 @@
 ### Get Banks
 GET https://bank.local/api/v1/banks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBbWlyIiwiaWF0IjoxNzg3NDcyNDQ4LCJleHAiOjE3ODc0NzYwNDh9.qEiYjfoFlMwSYPE-1cXE2cjQHIHmJgNllz1AmhLJokI
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJSYWJlZSIsImlhdCI6MTc4NzQ3NjU0NywiZXhwIjoxNzg3NDgwMTQ3fQ.6ZNoFDY_WFOBHliTt2qruxoCfLPVq3qdTsRWxVIxKWo
 
 ### Register
 POST https://bank.local/api/v1/auth/register
@@ -17,19 +17,23 @@ POST https://bank.local/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "Rabee",
-  "password": "password1234"
+  "username": "Sanad",
+  "password": "password123"
 }
 
 
 ### Create Bank
 POST https://bank.local/api/v1/banks
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJTYW5hZCIsImlhdCI6MTc4NzQ3MjQwOCwiZXhwIjoxNzg3NDc2MDA4fQ.4VheuB5cOaqZtBhLuWFzSpBp4Es7OF-WxN6fKAE2iBk
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJTYW5hZCIsImlhdCI6MTc4NzU1NjIzMSwiZXhwIjoxNzg3NTU5ODMxfQ.3C2GHVlPLCEsmOz5GrUykuQfa-SqdcnxqlZspDzazWk
 
 {
   "name": "ajib"
 }
+
+### Delete Bank
+DELETE https://bank.local/api/v1/banks/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJTYW5hZCIsImlhdCI6MTc4NzU1NjIzMSwiZXhwIjoxNzg3NTU5ODMxfQ.3C2GHVlPLCEsmOz5GrUykuQfa-SqdcnxqlZspDzazWk
 
 ### Create Account
 POST https://bank.local/api/v1/banks/1/accounts
@@ -40,13 +44,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJSYWJlZSIsImlhdCI6MTc4NzQ3N
   "ownerName": "Sanad",
   "accountNumber": "0000",
   "accountType": "CURRENT"
-}
-
-### test https
-POST https://bank.local/api/v1/auth/login
-Content-Type: application/json
-
-{
-  "username": "Sanad",
-  "password": "password123"
 }
