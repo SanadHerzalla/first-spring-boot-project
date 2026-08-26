@@ -28,3 +28,6 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/changes/010-create-user-table.yaml
+
+  - include:
+      file: db/changelog/changes/011-create-refresh-tokens-table.yaml

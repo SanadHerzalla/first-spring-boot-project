@@ -1,10 +1,8 @@
 package com.sanad.firstspringbootproject.service;
 
-import com.sanad.firstspringbootproject.dto.auth.AuthResponse;
-import com.sanad.firstspringbootproject.dto.auth.LoginRequest;
-import com.sanad.firstspringbootproject.dto.auth.RegisterRequest;
-import com.sanad.firstspringbootproject.dto.auth.RegisterResponse;
+import com.sanad.firstspringbootproject.dto.auth.*;
 import com.sanad.firstspringbootproject.exception.DuplicateUserException;
+import com.sanad.firstspringbootproject.model.RefreshToken;
 import com.sanad.firstspringbootproject.model.Role;
 import com.sanad.firstspringbootproject.repository.UserRepository;
 import com.sanad.firstspringbootproject.security.JwtService;
@@ -23,16 +21,19 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtService jwtService
+            JwtService jwtService,
+            RefreshTokenService refreshTokenService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Transactional
@@ -71,8 +72,36 @@ public class AuthService {
                 .build();
 
         String token = jwtService.generateToken(userDetails);
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         return new AuthResponse(
                 token,
+                refreshToken.getToken(),
+                user.getUsername(),
+                user.getRole().name()
+        );
+    }
+
+
+    @Transactional
+    public AuthResponse refresh(RefreshRequest request) {
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(
+                request.refreshToken()
+        );
+
+        User user = refreshToken.getUser();
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
+                .build();
+
+        String newAccessToken = jwtService.generateToken(userDetails);
+
+        return new AuthResponse(
+                newAccessToken,
+                refreshToken.getToken(),
                 user.getUsername(),
                 user.getRole().name()
         );

@@ -45,3 +45,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJSYWJlZSIsImlhdCI6MTc4NzQ3N
   "accountNumber": "0000",
   "accountType": "CURRENT"
 }
+
+### Refresh access token
+POST https://bank.local/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "1e9f679b-6094-4861-9898-50476b1d7fe6"
+}

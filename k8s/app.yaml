@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: spring-bank-app
-          image: sanad/spring-bank-app:rbac-v2
+          image: sanad/spring-bank-app:refresh-v4
 
           ports:
             - containerPort: 8080
@@ -35,6 +35,9 @@ spec:
                   key: JWT_SECRET
             - name: JWT_EXPIRATION
               value: "3600000"
+
+            - name: JWT_REFRESH_EXPIRATION
+              value: "604800000"
 
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:

@@ -1,10 +1,7 @@
 package com.sanad.firstspringbootproject.controller;
 
 
-import com.sanad.firstspringbootproject.dto.auth.AuthResponse;
-import com.sanad.firstspringbootproject.dto.auth.LoginRequest;
-import com.sanad.firstspringbootproject.dto.auth.RegisterRequest;
-import com.sanad.firstspringbootproject.dto.auth.RegisterResponse;
+import com.sanad.firstspringbootproject.dto.auth.*;
 import com.sanad.firstspringbootproject.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,5 +25,10 @@ public class AuthController {
     public AuthResponse login(@Valid @RequestBody LoginRequest request){
         System.out.println("LOGIN CONTROLLER REACHED");
         return authService.login(request);
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponse refresh(@Valid @RequestBody RefreshRequest request){
+        return authService.refresh(request);
     }
 }
